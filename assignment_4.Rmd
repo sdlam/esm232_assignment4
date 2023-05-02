@@ -1,0 +1,11 @@
+---
+title: 'Assignment 4: Latin Hyper Cube and Sensitivity Analysis'
+author: "Sarah Lam & Katheryn Moya & Sofia Urgoiti"
+date: "2023-05-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
