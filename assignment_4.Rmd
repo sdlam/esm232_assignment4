@@ -7,5 +7,49 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(purrr)
+
+```
+
+```{r}
+# Latin Hypercube generation of parameters 
+# set a random seed to make things 'random'
+set.seed(1)
+
+# which parameters
+pnames = c("height", "kd", "k0", "windspeed")
+
+# how many parameters
+npar =  length(pnames)
+# how many samples
+nsample = 100
+
+parm_quant = randomLHS(nsample, npar)
+colnames(parm_quant)=pnames
+# choose distributions for parameters
+# v - normally distributed with a mean of 250 cm/s with a standard deviation of 30 cm/s
+# height - somewhere between 9.5 and 10.5 m (but any value in that range is equally likely)
+# kd and k0 - normally distributed with standard deviation of 1% of their default values
+# use random samples to pick the quantiles
+
+parm = as.data.frame(matrix(nrow=nrow(parm_quant), ncol=ncol(parm_quant)))
+colnames(parm) = pnames
+# for each parameter pick samples 
+# I'm using several examples normal distribution (with 10% standard deviation) and uniform with +- 10%
+# in reality I should pick distribution from knowledge about uncertainty in parameters
+
+# to make it easy to change i'm setting standard deviation / range variation to a variable
+pvar = .10
+
+parm[,"windspeed"] = qnorm(parm_quant[,"windspeed"], mean=250, sd=30)
+#parm[,"height"] = qnorm(parm_quant[,"height"], mean=-0.0046, sd=0.0046/pvar) --- UNSURE HOW TO 
+
+# normal distribution +- 10%
+parm[,"kd"] = qnorm(parm_quant[,"kd"], min=0.7-0.7/pvar, max=0.7+0.7/pvar)
+parm[,"k0"] = qnorm(parm_quant[,"k0"], min=0.1-0.1/pvar, max=0.1+0.1/pvar)
+
+head(parm)
 ```
 
