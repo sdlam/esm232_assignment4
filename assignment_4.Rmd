@@ -34,6 +34,9 @@ library(tidyverse)
 library(purrr)
 ```
 
+
+## A. Latin Hypercube Parameter Generation
+
 ```{r}
 # Latin Hypercube generation of parameters 
 # set a random seed to make things 'random'
@@ -73,4 +76,20 @@ parm[,"k0"] = qnorm(parm_quant[,"k0"], min=0.1-0.1/pvar, max=0.1+0.1/pvar)
 
 head(parm)
 ```
+
+## B. Running Atmospheric Conductance Model
+
+## C. Plotting Conductance Estimates & Parameter Uncertainty
+
+## D. Plotting Conductance against each parameter
+
+## E. Partial Rank Correlation Coefficients
+
+## F. Discussion
+
+
+
+
+
+
 
