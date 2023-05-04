@@ -5,12 +5,33 @@ date: "2023-05-02"
 output: html_document
 ---
 
+# Your task
+
+For a given forest, you will perform a sensitivity analysis of model predictions of conductance. Consider the sensitivity of your estimate to uncertainty in the following parameters and inputs
+• height
+• kd
+• k0
+• v
+
+- Windspeeds v are normally distributed with a mean of 250 cm/s with a standard deviation of 30 cm/s.
+- For vegetation height assume that height is somewhere between 9.5 and 10.5 m (but any value in that range is equally likely).
+- For the kd and k0 parameters you can assume that they are normally distributed with standard deviation of 1% of their default values.
+
+a) Use the Latin hypercube approach to generate parameter values for the 4 parameters
+b) Run the atmospheric conductance model for these parameters
+c) Plot conductance estimates in a way that accounts for parameter uncertainty
+d) Plot conductance estimates against each of your parameters
+e) Estimate the Partial Rank Correlation Coefficients
+f) Discuss what your results tell you about how aerodynamic conductance? What does it suggest about
+what you should focus on if you want to reduce uncertainty in aerodymaic conductance estimates?
+Does this tell you anything about the sensitivity of plant water use to climate change?
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 library(purrr)
-
 ```
 
 ```{r}
