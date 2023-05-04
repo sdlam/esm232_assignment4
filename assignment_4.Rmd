@@ -10,8 +10,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 library(purrr)
-
+library(lhs)
+library(sensitivity)
+library(here)
 ```
+
+
+## A. Latin Hypercube Parameter Generation 
+
+Creating a matrix with random samples for the four parameters in our function to choose quantiles that will full sample parameter space. 
 
 ```{r}
 # Latin Hypercube generation of parameters 
@@ -19,7 +26,7 @@ library(purrr)
 set.seed(1)
 
 # which parameters
-pnames = c("height", "kd", "k0", "windspeed")
+pnames = c("v", "height", "k_o", "k_d")
 
 # how many parameters
 npar =  length(pnames)
@@ -40,16 +47,63 @@ colnames(parm) = pnames
 # I'm using several examples normal distribution (with 10% standard deviation) and uniform with +- 10%
 # in reality I should pick distribution from knowledge about uncertainty in parameters
 
-# to make it easy to change i'm setting standard deviation / range variation to a variable
-pvar = .10
+# to make it easy to change set standard deviation / range variation to a variable
+pvar = .010
 
-parm[,"windspeed"] = qnorm(parm_quant[,"windspeed"], mean=250, sd=30)
-#parm[,"height"] = qnorm(parm_quant[,"height"], mean=-0.0046, sd=0.0046/pvar) --- UNSURE HOW TO 
+parm[,"v"] = qnorm(parm_quant[,"v"], mean=2.5, sd=0.3) #convert to meters/s for function
+parm[,"height"] = qunif(parm_quant[,"height"], min=9.5, max=10.5) 
 
-# normal distribution +- 10%
-parm[,"kd"] = qnorm(parm_quant[,"kd"], min=0.7-0.7/pvar, max=0.7+0.7/pvar)
-parm[,"k0"] = qnorm(parm_quant[,"k0"], min=0.1-0.1/pvar, max=0.1+0.1/pvar)
+# normal distribution 1% sd
+parm[,"k_d"] = qnorm(parm_quant[,"k_d"], mean=0.7, sd=0.7*pvar)
+parm[,"k_o"] = qnorm(parm_quant[,"k_o"], mean=0.1, sd=0.1*pvar)
 
-head(parm)
+head(parm) #creating a data frame of 100 potential parameter values based on the mean and sd of each parameter for sensitivity analysis
 ```
+
+## B. Running Atmospheris Conductance Model 
+
+The model output is atmospheric conductance in mm/s for a given vegetation type (forest). 
+
+```{r}
+source(here("R/Catm.R"))
+
+catm <-  parm %>% pmap(Catm)
+
+head(catm)
+
+#turn results into a data fram 
+
+catm_df <- do.call("rbind", catm) 
+
+catm_parm <- cbind(parm, catm_df)
+
+nrow(catm_df)
+```
+
+## C. Plotting Conductance Estimates & Parameter Uncertainty
+
+```{r}
+#Sarah
+# density of boxplot to visualize all of the output
+# 1 plot
+```
+
+
+## D. Plotting Conductance Against Each Parameter
+```{r}
+#Sofia
+# plotted against the parameter 
+# four plots 
+```
+
+
+## E. Partial Rank Correlation Coefficients
+```{r}
+#Katheryn
+
+```
+
+
+## F. Discussion
+
 
