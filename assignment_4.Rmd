@@ -128,22 +128,22 @@ sens_result <- pcc(catm_parm, catm_df)
 
 # see coefficients
 
-sen_result
+sens_result
 
 # efficiently plot them
 
-plot(sen_result)
+plot(sens_result)
 
 # try again using rank coefficients
 
-sen_result_rank = pcc(parm, yieldsd$maxyield, rank=TRUE )
-sen_result_rank
-plot(sen_result_rank)
+sens_result_rank = pcc(parm, yieldsd$maxyield, rank=TRUE )
+sens_result_rank
+plot(sens_result_rank)
 
 # R sometimes returns complex lists - to see what you have
-str(sen_result)
+str(sens_result)
 
-sen_result$PCC
+sens_result$PCC
 
 # plot parameter sensitivity
 # a bit tricky but nice way to make it easy to plot all parameters against all values
