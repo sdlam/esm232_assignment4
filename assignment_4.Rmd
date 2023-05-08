@@ -70,28 +70,15 @@ colnames(parm) = pnames
 # for each parameter pick samples 
 # I'm using several examples normal distribution (with 10% standard deviation) and uniform with +- 10%
 # in reality I should pick distribution from knowledge about uncertainty in parameters
-
-<<<<<<< HEAD
-# to make it easy to change i'm setting standard deviation / range variation to a variable
-pvar = .01
-=======
 # to make it easy to change set standard deviation / range variation to a variable
 pvar = .010
->>>>>>> 2bd12e6aa4a1c242355ddf3ab03e1381d4be046c
 
 parm[,"v"] = qnorm(parm_quant[,"v"], mean=2.5, sd=0.3) #convert to meters/s for function
 parm[,"height"] = qunif(parm_quant[,"height"], min=9.5, max=10.5) 
 
-<<<<<<< HEAD
-# normal distribution +- 10%
-parm[,"kd"] = qnorm(parm_quant[,"kd"], min=0.7-0.07/pvar, max=0.7+0.7/pvar)
-parm[,"k0"] = qnorm(parm_quant[,"k0"], min=0.1-0.01/pvar, max=0.1+0.1/pvar)
-
-=======
 # normal distribution 1% sd
 parm[,"k_d"] = qnorm(parm_quant[,"k_d"], mean=0.7, sd=0.7*pvar)
 parm[,"k_o"] = qnorm(parm_quant[,"k_o"], mean=0.1, sd=0.1*pvar)
->>>>>>> 2bd12e6aa4a1c242355ddf3ab03e1381d4be046c
 
 head(parm) #creating a data frame of 100 potential parameter values based on the mean and sd of each parameter for sensitivity analysis
 ```
@@ -129,8 +116,13 @@ nrow(catm_df)
 
 ```{r}
 #Sarah
-# density of boxplot to visualize all of the output
-# 1 plot
+# 1 density plot of boxplot to visualize all of the output
+catm_long <-  catm_parm %>% gather(value="catm_df", key="parm")
+ggplot(catm_long, aes(x = parm, y = catm_df, col=parm)) +
+  geom_boxplot() +
+  labs(y="Atmospheric Conductance", 
+       x="Parameter") +
+  facet_wrap(~parm, scales="free")
 ```
 
 
@@ -178,15 +170,12 @@ plot(sen_result_rank)
 # R sometimes returns complex lists - to see what you have
 str(sen_result)
 
-sens_result$PCC
+sen_result$PCC
 
 # plot parameter sensitivity
 # a bit tricky but nice way to make it easy to plot all parameters against all values
 tmp = cbind.data.frame(catm_sd, catm_parm)
 ```
-
-
-
 
 ## F. Discussion
 
