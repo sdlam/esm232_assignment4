@@ -5,30 +5,8 @@ date: "2023-05-02"
 output: html_document
 ---
 
-# Your task
-
-For a given forest, you will perform a sensitivity analysis of model predictions of conductance. Consider the sensitivity of your estimate to uncertainty in the following parameters and inputs
-• height
-• kd
-• k0
-• v
-
-- Windspeeds v are normally distributed with a mean of 250 cm/s with a standard deviation of 30 cm/s.
-- For vegetation height assume that height is somewhere between 9.5 and 10.5 m (but any value in that range is equally likely).
-- For the kd and k0 parameters you can assume that they are normally distributed with standard deviation of 1% of their default values.
-
-a) Use the Latin hypercube approach to generate parameter values for the 4 parameters
-b) Run the atmospheric conductance model for these parameters
-c) Plot conductance estimates in a way that accounts for parameter uncertainty
-d) Plot conductance estimates against each of your parameters
-e) Estimate the Partial Rank Correlation Coefficients
-f) Discuss what your results tell you about how aerodynamic conductance? What does it suggest about
-what you should focus on if you want to reduce uncertainty in aerodymaic conductance estimates?
-Does this tell you anything about the sensitivity of plant water use to climate change?
-
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE, echo = TRUE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 library(tidyverse)
 library(purrr)
@@ -41,8 +19,6 @@ library(here)
 ## A. Latin Hypercube Parameter Generation 
 
 Creating a matrix with random samples for the four parameters in our function to choose quantiles that will full sample parameter space. 
-
-• Define the range (pdf) of input parameters
 
 ```{r}
 # Latin Hypercube generation of parameters 
@@ -106,16 +82,18 @@ nrow(catm_df)
 ## C. Plotting Conductance Estimates & Parameter Uncertainty
 
 ```{r}
-#Sarah
 # 1 density plot of boxplot to visualize all of the output
-catm_long <-  catm_parm %>% gather(value="catm_df", key="parm")
+catm_long <-  catm_parm %>% pivot_longer(cols=c(v:k_d),
+                    names_to='parm',
+                    values_to='variance')
 ggplot(catm_long, aes(x = parm, y = catm_df, col=parm)) +
   geom_boxplot() +
   labs(y="Atmospheric Conductance", 
-       x="Parameter") +
-  facet_wrap(~parm, scales="free")
+       x="Parameter") 
+  #facet_wrap(~parm, scales="free")
 ```
 
+Figure 1 uses a box plot to graphically shows the impact of uncertainty on our atmospheric conductance model across the four parameters in a given forest. Purely based on the box plot it is difficult to tell which parameter is driving the uncertainty in our output since the variation is similar across all parameters. To further investigate we will next graph the conductance against each parameter.  
 
 ## D. Plotting Conductance Against Each Parameter
 ```{r}
@@ -127,10 +105,10 @@ ggplot(df2, aes(parmvalue, yvalue,
 col=conductance)) + geom_point(aes(colour=parm)) + facet_wrap(~conductance*parm, scales="free", ncol=4)
 ```
 
+In Figure 2, atmospheric conductance uncertainty is plotted against each of the 4 parameters. The windspeed parameter (v) presents a clear monotonic and positive relationship, with data points forming a straight line. This indicates that windspeed is an important parameter in determining atmospheric conductance, relative to other parameters such as height, or k0 and kd. Therefore, to reduce uncertainty in atmospheric conductance estimates, a greater focus should be placed in increasing the accuracy of windspeed measurements which are then input in models. 
 
 ## E. Partial Rank Correlation Coefficients
 ```{r}
-#Katheryn
 # combine parameter sets with output
 
 sen_result <- pcc(parm, catm_df)
@@ -153,18 +131,14 @@ plot(sen_result_rank)
 str(sen_result)
 
 sen_result$PCC
-
-# plot parameter sensitivity
-# a bit tricky but nice way to make it easy to plot all parameters against all values
-tmp = cbind.data.frame(catm_sd, catm_parm)
 ```
+
+From the PCC we can tell that the parameter with the highest correlation with model output is indeed windspeed (v). 
 
 ## F. Discussion
 
-In Figure 2, atmospheric conductance uncertainty is plotted against each of the 4 parameters. The windspeed parameter (v) presents a clear monotonic and positive relationship, with data points forming a straight line. This indicates that windspeed is an important parameter in determining atmospheric conductance, relative to other parameters such as height, or k0 and kd. Therefore, to reduce uncertainty in atmospheric conductance estimates, a greater focus should be placed in increasing the accuracy of windspeed measurements which are then input in models. 
+Our results tell us that atmospheric conductance in a given forest is most influenced by windspeed, followed by vegetation height, and roughness, and is the least impacted by the zero plane displacement. This suggests that, in order to reduce uncertainty in aerodynamic conductance estimates, you should attempt to get the best parameter estimates for windspeed and height in a given forest. In the context of plant sensitivity ti climate change, this tells us that plant water may change as a result of chagnes in highly correlated variable such as windespeed in a given forest because plant water use is highly related to atmospheric conduction. Plant evapotranspiration is more likely to be effected by changes in windspeeds as this parameter has the greatest influence on atmospheric conductance. 
 
-Discuss what your results tell you about how aerodynamic conductance? What does it suggest about
-what you should focus on if you want to reduce uncertainty in aerodymaic conductance estimates?
-Does this tell you anything about the sensitivity of plant water use to climate change?
+
 
 
