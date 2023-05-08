@@ -32,10 +32,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 library(purrr)
+library(lhs)
+library(sensitivity)
+library(here)
 ```
 
 
-## A. Latin Hypercube Parameter Generation
+## A. Latin Hypercube Parameter Generation 
+
+Creating a matrix with random samples for the four parameters in our function to choose quantiles that will full sample parameter space. 
 
 • Define the range (pdf) of input parameters
 
@@ -45,7 +50,7 @@ library(purrr)
 set.seed(1)
 
 # which parameters
-pnames = c("height", "kd", "k0", "windspeed")
+pnames = c("v", "height", "k_o", "k_d")
 
 # how many parameters
 npar =  length(pnames)
@@ -66,21 +71,50 @@ colnames(parm) = pnames
 # I'm using several examples normal distribution (with 10% standard deviation) and uniform with +- 10%
 # in reality I should pick distribution from knowledge about uncertainty in parameters
 
+<<<<<<< HEAD
 # to make it easy to change i'm setting standard deviation / range variation to a variable
 pvar = .01
+=======
+# to make it easy to change set standard deviation / range variation to a variable
+pvar = .010
+>>>>>>> 2bd12e6aa4a1c242355ddf3ab03e1381d4be046c
 
-parm[,"windspeed"] = qnorm(parm_quant[,"windspeed"], mean=250, sd=30)
-#parm[,"height"] = qnorm(parm_quant[,"height"], mean=-0.0046, sd=0.0046/pvar) --- UNSURE HOW TO 
+parm[,"v"] = qnorm(parm_quant[,"v"], mean=2.5, sd=0.3) #convert to meters/s for function
+parm[,"height"] = qunif(parm_quant[,"height"], min=9.5, max=10.5) 
 
+<<<<<<< HEAD
 # normal distribution +- 10%
 parm[,"kd"] = qnorm(parm_quant[,"kd"], min=0.7-0.07/pvar, max=0.7+0.7/pvar)
 parm[,"k0"] = qnorm(parm_quant[,"k0"], min=0.1-0.01/pvar, max=0.1+0.1/pvar)
 
+=======
+# normal distribution 1% sd
+parm[,"k_d"] = qnorm(parm_quant[,"k_d"], mean=0.7, sd=0.7*pvar)
+parm[,"k_o"] = qnorm(parm_quant[,"k_o"], mean=0.1, sd=0.1*pvar)
+>>>>>>> 2bd12e6aa4a1c242355ddf3ab03e1381d4be046c
 
-head(parm)
+head(parm) #creating a data frame of 100 potential parameter values based on the mean and sd of each parameter for sensitivity analysis
 ```
 
-## B. Running Atmospheric Conductance Model
+## B. Running Atmospheris Conductance Model 
+
+The model output is atmospheric conductance in mm/s for a given vegetation type (forest). 
+
+```{r}
+source(here("R/Catm.R"))
+
+catm <-  parm %>% pmap(Catm)
+
+head(catm)
+
+#turn results into a data fram 
+
+catm_df <- do.call("rbind", catm) 
+
+catm_parm <- cbind(parm, catm_df)
+
+nrow(catm_df)
+```
 
 • Define output to be considered: atmospheric conductance (mm/s)
 • Sample the pdf of input parameters and use this sample to run the model
@@ -93,7 +127,20 @@ head(parm)
 
 ## C. Plotting Conductance Estimates & Parameter Uncertainty
 
-## D. Plotting Conductance against each parameter
+```{r}
+#Sarah
+# density of boxplot to visualize all of the output
+# 1 plot
+```
+
+
+## D. Plotting Conductance Against Each Parameter
+```{r}
+#Sofia
+# plotted against the parameter 
+# four plots 
+```
+
 
 ```{r}
 # plot parameter sensitivity
@@ -108,15 +155,40 @@ ncol=5)
 
 
 ## E. Partial Rank Correlation Coefficients
+```{r}
+#Katheryn
+# combine parameter sets with output
+
+sens_result <- pcc(catm_parm, catm_df)
+
+# see coefficients
+
+sens_result
+
+# efficiently plot them
+
+plot(sens_result)
+
+# try again using rank coefficients
+
+sens_result_rank = pcc(parm, yieldsd$maxyield, rank=TRUE )
+sens_result_rank
+plot(sens_result_rank)
+
+# R sometimes returns complex lists - to see what you have
+str(sens_result)
+
+sens_result$PCC
+
+# plot parameter sensitivity
+# a bit tricky but nice way to make it easy to plot all parameters against all values
+tmp = cbind.data.frame(catm_sd, catm_parm)
+```
 
 
 
 
 ## F. Discussion
-
-
-
-
 
 
 
