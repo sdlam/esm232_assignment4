@@ -103,15 +103,6 @@ catm_parm <- cbind(parm, catm_df)
 nrow(catm_df)
 ```
 
-• Define output to be considered: atmospheric conductance (mm/s)
-• Sample the pdf of input parameters and use this sample to run the model
-
-
-```{r}
-
-```
-
-
 ## C. Plotting Conductance Estimates & Parameter Uncertainty
 
 ```{r}
@@ -128,21 +119,12 @@ ggplot(catm_long, aes(x = parm, y = catm_df, col=parm)) +
 
 ## D. Plotting Conductance Against Each Parameter
 ```{r}
-#Sofia
-# plotted against the parameter 
-# four plots 
-```
+#catm_parm is already a dataframe so we do not need to bind anything prior (...)
+df = catm_parm %>% gather(catm_df, value = "yvalue", key = "conductance")
+df2 = df %>% gather(-conductance, -yvalue, key = "parm", value = "parmvalue")
 
-
-```{r}
-# plot parameter sensitivity
-# a bit tricky but nice way to make it easy to plot all parameters against all values
-tmp = cbind.data.frame(yieldsd, parm)
-tmp2 = tmp %>% gather(maxyield, minyield, meanyield, value="yvalue",key="yieldtype")
-tmp3 = tmp2 %>% gather(-yvalue, -yieldtype, key="parm", value="parmvalue")
-ggplot(tmp3, aes(parmvalue, yvalue,
-col=yieldtype))+geom_point()+facet_wrap(~yieldtype*parm, scales="free",
-ncol=5)
+ggplot(df2, aes(parmvalue, yvalue,
+col=conductance)) + geom_point(aes(colour=parm)) + facet_wrap(~conductance*parm, scales="free", ncol=4)
 ```
 
 
@@ -151,7 +133,7 @@ ncol=5)
 #Katheryn
 # combine parameter sets with output
 
-sen_result <- pcc(catm_parm, catm_df)
+sen_result <- pcc(parm, catm_df)
 
 # see coefficients
 
@@ -163,7 +145,7 @@ plot(sen_result)
 
 # try again using rank coefficients
 
-sen_result_rank = pcc(parm, yieldsd$maxyield, rank=TRUE )
+sen_result_rank = pcc(parm, catm_df, rank=TRUE)
 sen_result_rank
 plot(sen_result_rank)
 
@@ -179,5 +161,10 @@ tmp = cbind.data.frame(catm_sd, catm_parm)
 
 ## F. Discussion
 
+In Figure 2, atmospheric conductance uncertainty is plotted against each of the 4 parameters. The windspeed parameter (v) presents a clear monotonic and positive relationship, with data points forming a straight line. This indicates that windspeed is an important parameter in determining atmospheric conductance, relative to other parameters such as height, or k0 and kd. Therefore, to reduce uncertainty in atmospheric conductance estimates, a greater focus should be placed in increasing the accuracy of windspeed measurements which are then input in models. 
+
+Discuss what your results tell you about how aerodynamic conductance? What does it suggest about
+what you should focus on if you want to reduce uncertainty in aerodymaic conductance estimates?
+Does this tell you anything about the sensitivity of plant water use to climate change?
 
 
