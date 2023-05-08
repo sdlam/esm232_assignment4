@@ -122,7 +122,32 @@ nrow(catm_df)
 ## E. Partial Rank Correlation Coefficients
 ```{r}
 #Katheryn
+# combine parameter sets with output
 
+sens_result <- pcc(catm_parm, catm_df)
+
+# see coefficients
+
+sen_result
+
+# efficiently plot them
+
+plot(sen_result)
+
+# try again using rank coefficients
+
+sen_result_rank = pcc(parm, yieldsd$maxyield, rank=TRUE )
+sen_result_rank
+plot(sen_result_rank)
+
+# R sometimes returns complex lists - to see what you have
+str(sen_result)
+
+sen_result$PCC
+
+# plot parameter sensitivity
+# a bit tricky but nice way to make it easy to plot all parameters against all values
+tmp = cbind.data.frame(catm_sd, catm_parm)
 ```
 
 ## F. Discussion
